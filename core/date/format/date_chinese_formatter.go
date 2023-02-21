@@ -15,7 +15,7 @@
 package format
 
 import (
-	"fmt"
+	"errors"
 	"strconv"
 	"strings"
 	"time"
@@ -38,12 +38,14 @@ const (
 	ChineseYearToSecondWithWeek = "2006年1月2日 Mon 3时4分5秒"
 )
 
+// ChineseTime stores the time for Chinese date parsing or formatting.
 type ChineseTime struct {
 	Time time.Time
+	// Mode 0 use "星期" and 1 use "周"
 	Mode uint8
 }
 
-// ChineseFormat format date to Chinese string
+// ChineseFormat format date to Chinese string.
 // The layout include ChineseStandard, ChineseYearToWeek and so on.
 // The mode 0 means the weekday use "星期" as prefix, else use "周" as prefix.
 // e.g.
@@ -101,43 +103,41 @@ func convertWeekdayFromEnglishToChinese(dateString string, mode uint8) string {
 	return strings.Join(dateSplit, " ")
 }
 
-// Parse set the time from a date string such as 2006年1月2日 3时4分5秒
+// Parse set the time from a date string such as 2006年1月2日 3时4分5秒.
 func (c *ChineseTime) Parse(dateString, layout string) (err error) {
 	var year, month, day, hour, minute, second int
 	dateRune := []rune(dateString)
-	numberExtract := func(data []rune) (result []int, err error) {
+	numberExtract := func(data []rune) (result []int) {
 		var tmpString strings.Builder
 		for _, v := range dateRune {
 			if v >= 48 && v <= 57 {
 				tmpString.WriteRune(v)
 			} else if tmpString.Len() > 0 {
-				strConv, err := strconv.Atoi(tmpString.String())
-				if err != nil {
-					return nil, fmt.Errorf("failed to parse rune to int, err: %v", err)
-				}
+				strConv, _ := strconv.Atoi(tmpString.String())
 				result = append(result, strConv)
 				tmpString.Reset()
 			} else {
 				tmpString.Reset()
 			}
 		}
-		return result, err
+		return result
 	}
 
-	numberArray, err := numberExtract(dateRune)
-	if err != nil {
-		return err
+	numberArray := numberExtract(dateRune)
+
+	if len(numberArray) < 3 {
+		return errors.New("there are not enough parameters in date string")
 	}
 
 	switch layout {
-	case ChineseStandard:
+	case ChineseStandard, ChineseYearToSecondWithWeek:
 		year = numberArray[0]
 		month = numberArray[1]
 		day = numberArray[2]
 		hour = numberArray[3]
 		minute = numberArray[4]
 		second = numberArray[5]
-	case ChineseYearToDay:
+	case ChineseYearToDay, ChineseYearToWeek:
 		year = numberArray[0]
 		month = numberArray[1]
 		day = numberArray[2]

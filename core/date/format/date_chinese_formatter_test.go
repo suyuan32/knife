@@ -60,4 +60,7 @@ func TestChineseTime_Parse(t *testing.T) {
 	err = targetTime.Parse("2023年11月12日", "2006")
 	assert.Nil(t, err)
 	assert.Equal(t, targetTime.Time.String(), wantedTime.String())
+
+	err = targetTime.Parse("", "2006")
+	assert.NotNil(t, err)
 }
