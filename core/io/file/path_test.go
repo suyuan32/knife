@@ -148,10 +148,10 @@ func TestFileExists(t *testing.T) {
 	tmpDirPath := filepath.Join(os.TempDir(), "knife_test")
 
 	result := FileExist(filepath.Join(tmpDirPath, "1.txt"))
-	assert.Equal(t, true, result)
+	assert.Nil(t, result)
 
 	result = FileExist(filepath.Join(tmpDirPath, "10.txt"))
-	assert.Equal(t, false, result)
+	assert.NotNil(t, result)
 }
 
 func TestCreateIfNotExist(t *testing.T) {

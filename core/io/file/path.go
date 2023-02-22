@@ -127,15 +127,18 @@ func ContainFile(dirPath, fileName string) (bool, error) {
 	return false, err
 }
 
-// FileExist returns true if the specified file exists.
-func FileExist(file string) bool {
+// FileExist returns nil if the specified file exists.
+func FileExist(file string) error {
 	_, err := os.Stat(file)
-	return err == nil
+	if err != nil {
+		return fmt.Errorf("file does not exist, error: %v", err)
+	}
+	return err
 }
 
 // CreateIfNotExist creates a file if it does not exist.
 func CreateIfNotExist(filePath string) (*os.File, error) {
-	if FileExist(filePath) {
+	if FileExist(filePath) == nil {
 		return nil, fmt.Errorf("%s already exist", filePath)
 	}
 
@@ -144,7 +147,7 @@ func CreateIfNotExist(filePath string) (*os.File, error) {
 
 // RemoveIfExist deletes the specified file if exists.
 func RemoveIfExist(filename string) error {
-	if !FileExist(filename) {
+	if FileExist(filename) != nil {
 		return nil
 	}
 
@@ -176,11 +179,11 @@ func GetSubDir(path string, onlyName bool) (result []string, err error) {
 
 // ReadFileString returns string from a file
 func ReadFileString(path string) (string, error) {
-	if FileExist(path) {
+	if err := FileExist(path); err == nil {
 		fileData, _ := os.ReadFile(path)
 		return string(fileData), nil
 	} else {
-		return "", errors.New("file does not exist")
+		return "", err
 	}
 }
 
@@ -188,13 +191,16 @@ func ReadFileString(path string) (string, error) {
 // be created.
 func WriteFileString(path, data string, perm int) (err error) {
 	var fileData *os.File
-	if FileExist(path) {
+	if err = FileExist(path); err == nil {
 		fileData, err = os.OpenFile(path, os.O_RDWR, fs.FileMode(perm))
 		if err != nil {
 			return err
 		}
 	} else {
-		fileData, _ = CreateIfNotExist(path)
+		fileData, err = CreateIfNotExist(path)
+		if err != nil {
+			return err
+		}
 	}
 	defer fileData.Close()
 
@@ -204,7 +210,7 @@ func WriteFileString(path, data string, perm int) (err error) {
 
 // AppendFileString append the string to the target file
 func AppendFileString(path, data string, perm int) error {
-	if FileExist(path) {
+	if err := FileExist(path); err == nil {
 		fileData, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, fs.FileMode(perm))
 		if err != nil {
 			return err
@@ -217,6 +223,6 @@ func AppendFileString(path, data string, perm int) error {
 		}
 		return nil
 	} else {
-		return errors.New("file does not exist")
+		return err
 	}
 }
