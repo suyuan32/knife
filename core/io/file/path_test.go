@@ -129,29 +129,29 @@ func TestContainFile(t *testing.T) {
 
 	tmpDirPath := filepath.Join(os.TempDir(), "knife_test")
 
-	fileExist, err := ContainFile(tmpDirPath, "1.txt")
+	result, err := ContainFile(tmpDirPath, "1.txt")
 	assert.Nil(t, err)
-	assert.Equal(t, fileExist, true)
+	assert.Equal(t, result, true)
 
-	fileExist, err = ContainFile(tmpDirPath, "10.txt")
+	result, err = ContainFile(tmpDirPath, "10.txt")
 	assert.Nil(t, err)
-	assert.Equal(t, fileExist, false)
+	assert.Equal(t, result, false)
 
-	fileExist, err = ContainFile("", "10.txt")
+	result, err = ContainFile("", "10.txt")
 	assert.NotNil(t, err)
 }
 
-func TestFileExists(t *testing.T) {
+func TestExist(t *testing.T) {
 	err := createTempFiles()
 	assert.Nil(t, err)
 
 	tmpDirPath := filepath.Join(os.TempDir(), "knife_test")
 
-	result := FileExist(filepath.Join(tmpDirPath, "1.txt"))
-	assert.Equal(t, true, result)
+	result := Exist(filepath.Join(tmpDirPath, "1.txt"))
+	assert.Nil(t, result)
 
-	result = FileExist(filepath.Join(tmpDirPath, "10.txt"))
-	assert.Equal(t, false, result)
+	result = Exist(filepath.Join(tmpDirPath, "10.txt"))
+	assert.NotNil(t, result)
 }
 
 func TestCreateIfNotExist(t *testing.T) {
@@ -161,11 +161,11 @@ func TestCreateIfNotExist(t *testing.T) {
 
 	file, err := CreateIfNotExist(tmpFilePath)
 	assert.Nil(t, err)
-	file.Close()
+	defer file.Close()
 
 	file2, err := CreateIfNotExist(tmpFilePath)
 	assert.NotNil(t, err)
-	file2.Close()
+	defer file2.Close()
 
 	err = RemoveIfExist(tmpFilePath)
 	assert.Nil(t, err)
@@ -229,9 +229,25 @@ func TestWriteFileString(t *testing.T) {
 	err = WriteFileString(filepath.Join(tmpDirPath, "0.txt"), "Simple Admin", SuperPerm)
 	assert.Nil(t, err)
 
+	err = os.Chmod(filepath.Join(tmpDirPath, "0.txt"), SuperReadOnlyPerm)
+	assert.Nil(t, err)
+
+	err = WriteFileString(filepath.Join(tmpDirPath, "0.txt"), "Simple Admin", SuperPerm)
+	assert.NotNil(t, err)
+
 	fileString, err := ReadFileString(filepath.Join(tmpDirPath, "0.txt"))
 	assert.Nil(t, err)
 	assert.Equal(t, "Simple Admin", fileString)
+
+	err = WriteFileString(filepath.Join(tmpDirPath, "30.txt"), "Simple Admin", SuperPerm)
+	assert.Nil(t, err)
+
+	fileString, err = ReadFileString(filepath.Join(tmpDirPath, "30.txt"))
+	assert.Nil(t, err)
+	assert.Equal(t, "Simple Admin", fileString)
+
+	err = RemoveDir(tmpDirPath)
+	assert.Nil(t, err)
 }
 
 func TestAppendFileString(t *testing.T) {
@@ -240,9 +256,18 @@ func TestAppendFileString(t *testing.T) {
 
 	tmpDirPath := filepath.Join(os.TempDir(), "knife_test")
 
-	err = AppendFileString(filepath.Join(tmpDirPath, "2.txt"), "Hi!", SuperPerm)
-	assert.Nil(t, err)
-
 	err = AppendFileString(filepath.Join(tmpDirPath, "20.txt"), "Hi!", SuperPerm)
 	assert.NotNil(t, err)
+
+	err = os.Chmod(filepath.Join(tmpDirPath, "2.txt"), SuperReadOnlyPerm)
+	assert.Nil(t, err)
+
+	err = AppendFileString(filepath.Join(tmpDirPath, "2.txt"), "Hi!", SuperPerm)
+	assert.NotNil(t, err)
+
+	err = os.Chmod(filepath.Join(tmpDirPath, "2.txt"), SuperPerm)
+	assert.Nil(t, err)
+
+	err = AppendFileString(filepath.Join(tmpDirPath, "2.txt"), "Hi!", SuperPerm)
+	assert.Nil(t, err)
 }
