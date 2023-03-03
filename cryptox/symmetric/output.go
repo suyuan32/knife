@@ -15,21 +15,26 @@
 package symmetric
 
 import (
-	"fmt"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
+	"encoding/base64"
+	"encoding/hex"
 )
 
-var data = NewCryptoS()
-
-func TestNewCryptoS(t *testing.T) {
-	c := NewCryptoS()
-	assert.Equal(t, AES, c.Method)
-	assert.Equal(t, CBC, c.Mode)
+// ToString output data with string type.
+func (s *CryptoS) ToString() (string, error) {
+	return string(s.OutputData), s.Errors
 }
 
-func TestCryptoS_AES_CBC(t *testing.T) {
-	result := data.WithMethod(AES).WithMode(CBC).WithPadding(Zero).Encrypt().ToString()
-	fmt.Println(result)
+// ToBytes output data with byte type.
+func (s *CryptoS) ToBytes() ([]byte, error) {
+	return s.OutputData, s.Errors
+}
+
+// ToBase64String output data with base64 string.
+func (s *CryptoS) ToBase64String() (string, error) {
+	return base64.StdEncoding.EncodeToString(s.OutputData), s.Errors
+}
+
+// ToHexString output data with hex string.
+func (s *CryptoS) ToHexString() (string, error) {
+	return hex.EncodeToString(s.OutputData), s.Errors
 }

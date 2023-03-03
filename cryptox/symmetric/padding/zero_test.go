@@ -64,6 +64,11 @@ func TestDePaddingZero(t *testing.T) {
 			args: args{data: []byte{104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
 			want: []byte{104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100},
 		},
+		{
+			name: "test2",
+			args: args{},
+			want: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

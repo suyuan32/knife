@@ -3,6 +3,7 @@ Knife is a library with a set of out of box tools for golang.
 Knife(刀)是一个集合Go语言常用工具函数的库。
 
 ## 原则： 核心代码只依赖官方的库， 代码 coverage 不低于 90%
+## Principle: The core code only depends on the official library, and the code coverage is not less than 90%
 
 # Roadmap
 

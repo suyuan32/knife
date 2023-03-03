@@ -20,28 +20,28 @@ import (
 	"errors"
 )
 
-// FromBytes set input data from byte slice.
-func (s *CryptoS) FromBytes(data []byte) *CryptoS {
+// InputFromBytes set input data from byte slice.
+func (s *CryptoS) InputFromBytes(data []byte) *CryptoS {
 	s.InputData = data
 	return s
 }
 
-// FromString set input data from string.
-func (s *CryptoS) FromString(data string) *CryptoS {
+// InputFromString set input data from string.
+func (s *CryptoS) InputFromString(data string) *CryptoS {
 	s.InputData = []byte(data)
 	return s
 }
 
-// FromBase64String set input data from base64 string.
-func (s *CryptoS) FromBase64String(data string) *CryptoS {
+// InputFromBase64String set input data from base64 string.
+func (s *CryptoS) InputFromBase64String(data string) *CryptoS {
 	result, err := base64.StdEncoding.DecodeString(data)
 	s.Errors = errors.Join(s.Errors, err)
 	s.InputData = result
 	return s
 }
 
-// FromHexString set input data from hex string.
-func (s *CryptoS) FromHexString(data string) *CryptoS {
+// InputFromHexString set input data from hex string.
+func (s *CryptoS) InputFromHexString(data string) *CryptoS {
 	result, err := hex.DecodeString(data)
 	s.Errors = errors.Join(s.Errors, err)
 	s.InputData = result
