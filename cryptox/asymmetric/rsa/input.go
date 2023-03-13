@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package symmetric
+package rsa
 
 import (
 	"encoding/base64"
@@ -20,30 +20,30 @@ import (
 	"errors"
 )
 
-// KeyFromBytes set key data from byte slice.
-func (s *CryptoS) KeyFromBytes(data []byte) *CryptoS {
-	s.Key = data
+// InputFromBytes set input data from byte slice.
+func (s *RSA) InputFromBytes(data []byte) *RSA {
+	s.InputData = data
 	return s
 }
 
-// KeyFromString set key data from string.
-func (s *CryptoS) KeyFromString(data string) *CryptoS {
-	s.Key = []byte(data)
+// InputFromString set input data from string.
+func (s *RSA) InputFromString(data string) *RSA {
+	s.InputData = []byte(data)
 	return s
 }
 
-// KeyFromBase64String set key data from base64 string.
-func (s *CryptoS) KeyFromBase64String(data string) *CryptoS {
+// InputFromBase64String set input data from base64 string.
+func (s *RSA) InputFromBase64String(data string) *RSA {
 	result, err := base64.StdEncoding.DecodeString(data)
 	s.Errors = errors.Join(s.Errors, err)
-	s.Key = result
+	s.InputData = result
 	return s
 }
 
-// KeyFromHexString set key data from hex string.
-func (s *CryptoS) KeyFromHexString(data string) *CryptoS {
+// InputFromHexString set input data from hex string.
+func (s *RSA) InputFromHexString(data string) *RSA {
 	result, err := hex.DecodeString(data)
 	s.Errors = errors.Join(s.Errors, err)
-	s.Key = result
+	s.InputData = result
 	return s
 }
